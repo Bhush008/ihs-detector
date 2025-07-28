@@ -2,7 +2,7 @@ name: Run IHS Pattern Script
 
 on:
   schedule:
-    - cron: '0 4 * * *'  # Every day at 9:30 AM IST (4:00 UTC)
+    - cron: '25 15 * * *'  # Every day at 9:30 AM IST (4:00 UTC)
   workflow_dispatch:  # Allow manual run
 
 jobs:
