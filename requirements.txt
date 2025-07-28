@@ -8,4 +8,5 @@ logzero
 websocket-client
 pyotp
 scipy
+matplotlib
 git+https://github.com/angel-one/smartapi-python.git
