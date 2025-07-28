@@ -225,21 +225,31 @@ for run_start, stocks in detected_ihs_all_runs.items():
     else:
         print("  ❌ No IHS pattern detected in this run.")
 
+# Dynamically get all start dates from date_ranges
+start_dates = [datetime.strptime(start, "%Y-%m-%d %H:%M") for start, _ in date_ranges]
+
 summary_lines = []
 
-# After detecting IHS in a stock:
-summary_lines.append(f"Run from {start_date}:\n  - {stock_name}")
+for start_date in start_dates:
+    detected_stocks = all_ihs_results.get(start_date, [])
+    if detected_stocks:
+        summary_lines.append(f"Run from {start_date.strftime('%Y-%m-%d %H:%M')}:")
+        for stock in detected_stocks:
+            summary_lines.append(f"  - {stock}")
+    else:
+        summary_lines.append(f"Run from {start_date.strftime('%Y-%m-%d %H:%M')}:")
+        summary_lines.append("  ❌ No IHS pattern detected.")
+        
+# ✅ Final summary section
+summary_lines.insert(0, f"✅ Script completed at: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+summary_lines.insert(1, "Summary of IHS Patterns Detected:\n")
 
-# Or if no pattern:
-# summary_lines.append(f"Run from {start_date}:\n  ❌ No IHS pattern detected.")
+# 📤 Write final summary to file or print for email body
+summary_text = "\n".join(summary_lines)
 
-# After all stocks:
 with open("final_summary.txt", "w") as f:
-    f.write("Summary of IHS Patterns Detected:\n\n")
-    for line in summary_lines:
-        f.write(line + "\n")
+    f.write(summary_text)
 
-email_body = "\n".join(summary_lines)
-print(email_body)  # This print output will be captured for email body
+print("\n" + summary_text)
 
 
