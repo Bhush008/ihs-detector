@@ -38,9 +38,6 @@ jobs:
           SUMMARY="${SUMMARY//$'\r'/'%0D'}"
           echo "summary=$SUMMARY" >> $GITHUB_OUTPUT
           
-      - name: Debug: Print summary
-        run: echo "${{ steps.read_summary.outputs.summary }}"
-
       - name: Send summary email
         uses: dawidd6/action-send-mail@v3
         with:
