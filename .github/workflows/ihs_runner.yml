@@ -8,6 +8,7 @@ on:
 jobs:
   run-script:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -19,17 +20,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install git+https://github.com/angel-one/smartapi-python.git
+          pip install pandas logzero websocket-client
 
       - name: Run IHS detection script
         run: python NewLogic_1stHead_IHS_GitHub.py
 
-      - name: Read summary into output
+      - name: Read summary output from file
         id: summary
         run: |
-          echo "summary_output<<EOF" >> $GITHUB_OUTPUT
-          cat final_summary.txt >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          printf "summary_output<<EOF\n%s\nEOF\n" "$(cat final_summary.txt)" >> $GITHUB_OUTPUT
 
       - name: Send summary email
         uses: dawidd6/action-send-mail@v3
@@ -43,4 +43,5 @@ jobs:
           from: GitHub Actions <${{ secrets.EMAIL_USERNAME }}>
           content_type: text
           body: ${{ steps.summary.outputs.summary_output }}
+
 
