@@ -24,7 +24,13 @@ jobs:
         run: ls -al
 
       - name: ▶️ Run IHS script
-        run: python NewLogic_1stHead_IHS_GitHub.py > output.txt
+        id: run_script
+        run: |
+          python NewLogic_1stHead_IHS_GitHub.py > summary.txt
+          tail -n 100 summary.txt > filtered_summary.txt
+          echo "EMAIL_BODY<<EOF" >> $GITHUB_ENV
+          cat filtered_summary.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
 
       - name: 📧 Send Email with Output
@@ -37,6 +43,4 @@ jobs:
           subject: IHS Detection Report
           to: bhushpatil008@gmail.com.com
           from: GitHub Action <github@action.com>
-          body: |
-            The script has completed execution. See attached results.
-          attachments: output.txt
+          body: ${{ env.EMAIL_BODY }}
