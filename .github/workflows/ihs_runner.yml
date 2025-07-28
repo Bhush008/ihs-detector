@@ -23,6 +23,7 @@ jobs:
           pip install git+https://github.com/angel-one/smartapi-python.git
           pip install pandas logzero websocket-client pyotp
           pip install pandas logzero websocket-client pyotp scipy
+          pip install pandas logzero websocket-client pyotp scipy matplotlib
           pip install pandas logzero websocket-client
 
       - name: Run IHS detection script
