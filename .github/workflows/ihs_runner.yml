@@ -23,24 +23,23 @@ jobs:
       - name: 📂 List directory contents
         run: ls -al
 
-      - name: ▶️ Run IHS script
+      - name: ▶️ Run IHS Detection Script
         id: run_script
         run: |
-          python NewLogic_1stHead_IHS_GitHub.py > summary.txt
-          tail -n 100 summary.txt > filtered_summary.txt
+          python NewLogic_1stHead_IHS_GitHub.py
           echo "EMAIL_BODY<<EOF" >> $GITHUB_ENV
-          cat filtered_summary.txt >> $GITHUB_ENV
+          cat final_summary.txt >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-
-      - name: 📧 Send Email with Output
+      - name: 📧 Send Summary Email
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
-          server_port: 465
+          server_port: 587
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASS }}
-          subject: IHS Detection Report
-          to: bhushpatil008@gmail.com.com
-          from: GitHub Action <github@action.com>
+          subject: "✅ IHS Detection Summary"
+          to: bhushpatil008@gmail.com
+          from: GitHub IHS Bot <ihs@bot.com>
           body: ${{ env.EMAIL_BODY }}
+
