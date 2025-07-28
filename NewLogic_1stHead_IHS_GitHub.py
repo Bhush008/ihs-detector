@@ -14,7 +14,7 @@ api_key = 'joebm3IW'
 user_id = 'AAAF838728'
 pin = '0421'
 totpkey = 'SS4OWS4U3LH5YF66ZR63AYPUDE'
-num_stocks = 20
+num_stocks = 2000
 to_date = datetime.now().strftime("%Y-%m-%d") + " 15:30"
 date_ranges = [
     ("2023-01-01 09:15", to_date),
@@ -96,7 +96,7 @@ def detect_ihs_custom(df, atr_period=14, lookahead=5):
 
     # ✅ Ensure price rises to 92.5% of neckline AFTER HEAD
     post_head_range = close[head_idx+1:head_idx+15]
-    if len(post_head_range) == 0 or max(post_head_range) < neckline * 0.925:
+    if len(post_head_range) == 0 or max(post_head_range) < neckline * 0.98:
         return None
 
     # 🔍 Look for LS before head
@@ -107,7 +107,7 @@ def detect_ihs_custom(df, atr_period=14, lookahead=5):
         if low[ls_idx - 1] < ls_val:
             continue
         pre_ls_range = close[max(0, ls_idx - 5):ls_idx]
-        if len(pre_ls_range) == 0 or max(pre_ls_range) < neckline * 0.925:
+        if len(pre_ls_range) == 0 or max(pre_ls_range) < neckline * 0.98:
             continue
         break
     else:
@@ -123,7 +123,7 @@ def detect_ihs_custom(df, atr_period=14, lookahead=5):
 
         # ✅ Price must rise toward neckline BEFORE RS
         pre_rs_range = close[head_idx+1:rs_idx]
-        if len(pre_rs_range) == 0 or max(pre_rs_range) < neckline * 0.925:
+        if len(pre_rs_range) == 0 or max(pre_rs_range) < neckline * 0.98:
             continue
 
         # ✅ After RS: price must rise at least 2%
