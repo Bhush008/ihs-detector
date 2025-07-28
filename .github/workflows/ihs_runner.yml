@@ -1,8 +1,9 @@
+
 name: Run IHS Pattern Script
 
 on:
   schedule:
-    - cron: '0 16 * * *'  # Every day at 9:30 AM IST (4:00 UTC)
+    - cron: '20 16 * * *'  # Trigger IHS detection at 21:30 IST
   workflow_dispatch:  # Allow manual run
 
 jobs:
