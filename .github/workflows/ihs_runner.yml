@@ -1,0 +1,38 @@
+name: Run IHS Pattern Script
+
+on:
+  schedule:
+    - cron: '0 4 * * *'  # Every day at 9:30 AM IST (4:00 UTC)
+  workflow_dispatch:  # Allow manual run
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repo
+        uses: actions/checkout@v3
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: 📦 Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: ▶️ Run IHS script
+        run: NewLogic_1stHead_IHS_GitHub.py > output.txt
+
+      - name: 📧 Send Email with Output
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USER }}
+          password: ${{ secrets.EMAIL_PASS }}
+          subject: IHS Detection Report
+          to: bhushpatil008@gmail.com.com
+          from: GitHub Action <github@action.com>
+          body: |
+            The script has completed execution. See attached results.
+          attachments: output.txt
