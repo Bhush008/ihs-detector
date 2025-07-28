@@ -6,4 +6,5 @@ pyotp
 scipy
 logzero
 websocket-client
+pyotp
 git+https://github.com/angel-one/smartapi-python.git
