@@ -39,12 +39,11 @@ jobs:
         with:
           server_address: smtp.gmail.com
           server_port: 465
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
+          username: ${{ secrets.EMAIL_USER }}
+          password: ${{ secrets.EMAIL_PASS }}
           subject: IHS Summary Report
           to: bhushpatil008@gmail.com
           from: GitHub Actions <${{ secrets.EMAIL_USERNAME }}>
-          content_type: text
-          body: ${{ steps.summary.outputs.summary_output }}
+          html_body: ${{ steps.build_summary.outputs.summary }}
 
 
