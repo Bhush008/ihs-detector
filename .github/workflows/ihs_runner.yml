@@ -44,6 +44,6 @@ jobs:
           subject: IHS Summary Report
           to: bhushpatil008@gmail.com
           from: GitHub Actions <${{ secrets.EMAIL_USERNAME }}>
-          html_body: ${{ steps.build_summary.outputs.summary }}
+          body: ${{ steps.build_summary.outputs.summary }}
 
 
