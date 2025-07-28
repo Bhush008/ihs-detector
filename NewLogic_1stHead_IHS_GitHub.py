@@ -1,6 +1,3 @@
-# prie is not going to neckline after LS and After RS the price is also going belwo RS and IHS is detected
-
-
 from SmartApi import SmartConnect
 import pyotp
 import pandas as pd
@@ -17,7 +14,7 @@ api_key = 'joebm3IW'
 user_id = 'AAAF838728'
 pin = '0421'
 totpkey = 'SS4OWS4U3LH5YF66ZR63AYPUDE'
-num_stocks = 50
+num_stocks = 20
 to_date = datetime.now().strftime("%Y-%m-%d") + " 15:30"
 date_ranges = [
     ("2023-01-01 09:15", to_date),
@@ -225,23 +222,18 @@ for run_start, stocks in detected_ihs_all_runs.items():
     else:
         print("  ❌ No IHS pattern detected in this run.")
 
-# Dynamically get all start dates from date_ranges
-start_dates = [datetime.strptime(start, "%Y-%m-%d %H:%M") for start, _ in date_ranges]
-
 summary_lines = []
 
-for start_date in start_dates:
-    detected_stocks = all_ihs_results.get(start_date, [])
-    if detected_stocks:
-        summary_lines.append(f"Run from {start_date.strftime('%Y-%m-%d %H:%M')}:")
-        for stock in detected_stocks:
+for run_start, stocks in detected_ihs_all_runs.items():
+    summary_lines.append(f"Run from {run_start}:")
+    if stocks:
+        for stock in stocks:
             summary_lines.append(f"  - {stock}")
     else:
-        summary_lines.append(f"Run from {start_date.strftime('%Y-%m-%d %H:%M')}:")
         summary_lines.append("  ❌ No IHS pattern detected.")
-        
+
 # ✅ Final summary section
-summary_lines.insert(0, f"✅ Script completed at: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+summary_lines.insert(0, f"✅ Script completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 summary_lines.insert(1, "Summary of IHS Patterns Detected:\n")
 
 # 📤 Write final summary to file or print for email body
