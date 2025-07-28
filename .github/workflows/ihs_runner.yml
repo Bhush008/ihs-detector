@@ -42,7 +42,7 @@ jobs:
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: IHS Summary Report
-          to: your@email.com
+          to: bhushpatil008@gmail.com
           from: GitHub Actions <${{ secrets.EMAIL_USERNAME }}>
           content_type: text
           body: ${{ steps.summary.outputs.summary_output }}
