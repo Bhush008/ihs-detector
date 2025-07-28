@@ -20,8 +20,12 @@ jobs:
       - name: 📦 Install dependencies
         run: pip install -r requirements.txt
 
+      - name: 📂 List directory contents
+        run: ls -al
+
       - name: ▶️ Run IHS script
         run: python NewLogic_1stHead_IHS_GitHub.py > output.txt
+
 
       - name: 📧 Send Email with Output
         uses: dawidd6/action-send-mail@v3
