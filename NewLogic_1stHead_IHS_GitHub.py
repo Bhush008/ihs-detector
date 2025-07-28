@@ -227,3 +227,15 @@ for run_start, stocks in detected_ihs_all_runs.items():
 
 print("\n✅ Script completed at:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
+summary_lines = ["Summary of IHS Patterns Detected:\n"]
+for run_start, stocks in detected_ihs_all_runs.items():
+    summary_lines.append(f"Run from {run_start}:")
+    if stocks:
+        summary_lines.extend([f"  - {stock}" for stock in stocks])
+    else:
+        summary_lines.append("  ❌ No IHS pattern detected.")
+
+email_body = "\n".join(summary_lines)
+print(email_body)  # This print output will be captured for email body
+
+
