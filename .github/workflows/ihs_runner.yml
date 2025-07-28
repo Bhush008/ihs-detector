@@ -21,7 +21,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: ▶️ Run IHS script
-        run: NewLogic_1stHead_IHS_GitHub.py > output.txt
+        run: python NewLogic_1stHead_IHS_GitHub.py > output.txt
 
       - name: 📧 Send Email with Output
         uses: dawidd6/action-send-mail@v3
