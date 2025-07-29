@@ -171,7 +171,6 @@ for from_date, stocks in detected_ihs_all_runs.items():
 summary = "\n".join(summary_lines)
 print(summary)
 
-# Output to a GitHub Actions-friendly format:
-with open("summary_env.txt", "w") as f:
-    summary_env = summary.replace('%', '%25').replace('\n', '%0A').replace('\r', '%0D')
-    f.write(f"summary={summary_env}")
+# Save plain text summary for email attachment
+with open("ihs_summary.txt", "w") as f:
+    f.write(summary)
