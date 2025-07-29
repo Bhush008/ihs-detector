@@ -15,7 +15,7 @@ api_key = 'joebm3IW'
 user_id = 'AAAF838728'
 pin = '0421'
 totpkey = 'SS4OWS4U3LH5YF66ZR63AYPUDE'
-num_stocks = 200
+num_stocks = 2500
 
 longest_from_date = "2023-01-01 09:15"
 # Set dynamic to_date as current date at 15:30
