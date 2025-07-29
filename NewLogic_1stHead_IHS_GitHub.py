@@ -8,6 +8,7 @@ import requests
 import time
 from datetime import datetime
 from scipy.signal import argrelextrema
+from dateutil.relativedelta import relativedelta
 
 # === CONFIGURATION === #
 api_key = 'joebm3IW'
@@ -15,20 +16,24 @@ user_id = 'AAAF838728'
 pin = '0421'
 totpkey = 'SS4OWS4U3LH5YF66ZR63AYPUDE'
 num_stocks = 200
-to_date = datetime.now().strftime("%Y-%m-%d") + " 15:30"
+
 longest_from_date = "2023-01-01 09:15"
-date_ranges = [
-    ("2023-01-01 09:15", to_date),
-    ("2023-04-01 09:15", to_date),
-    ("2023-07-01 09:15", to_date),
-    ("2023-10-01 09:15", to_date),
-    ("2024-01-01 09:15", to_date),
-    ("2024-04-01 09:15", to_date),
-    ("2024-07-01 09:15", to_date),
-    ("2024-10-01 09:15", to_date),
-    ("2025-01-01 09:15", to_date),
-    ("2025-04-01 09:15", to_date)
-]
+# Set dynamic to_date as current date at 15:30
+to_date_obj = datetime.now()
+to_date = to_date_obj.strftime("%Y-%m-%d") + " 15:30"
+
+# Generate 'from' dates from Jan 1, 2023 to Jan 1, 2025 (inclusive)
+start_from_date = datetime(2023, 1, 1, 9, 15)
+end_cutoff = datetime(2025, 1, 1)
+
+date_ranges = []
+current = start_from_date
+
+while current <= end_cutoff:
+    from_str = current.strftime("%Y-%m-%d %H:%M")
+    date_ranges.append((from_str, to_date))
+    current += relativedelta(months=1)
+
 interval = "ONE_DAY"
 
 # === LOGIN === #
@@ -81,36 +86,64 @@ def add_atr_column(df, period=14):
 
 def detect_ihs_custom(df, atr_period=14, lookahead=5):
     df = add_atr_column(df, atr_period)
-    close, low = df['Close'].values, df['Low'].values
+    close, low, high = df['Close'].values, df['Low'].values, df['High'].values
     n = len(close)
+    neckline = high.max()
 
-    head_idx = np.argmin(low)
-    head_val = low[head_idx]
-    neckline = df['High'].max()
+    for i in range(20, n - lookahead - 1):
+        # Step 1: Rally near neckline
+        if close[i] < neckline * 0.96:
+            continue
+        
+        # Step 2: Drop to form LS
+        ls_idx = i + 1
+        while ls_idx < n - lookahead and low[ls_idx] > low[ls_idx + 1]:
+            ls_idx += 1
+        if ls_idx >= n - lookahead:
+            continue
+        ls_val = low[ls_idx]
 
-    if max(close[head_idx+1:head_idx+15], default=0) < neckline * 0.98:
-        return None
+        # Step 3: Rally near neckline again
+        peak_after_ls = max(close[ls_idx:ls_idx + 15], default=0)
+        if peak_after_ls < neckline * 0.96:
+            continue
 
-    for ls_idx in range(head_idx - 2, 2, -1):
-        if low[ls_idx] <= head_val or low[ls_idx - 1] < low[ls_idx]: continue
-        if max(close[max(0, ls_idx - 5):ls_idx], default=0) < neckline * 0.98: continue
-        break
-    else: return None
+        # Step 4: Drop below LS to form Head
+        head_idx = ls_idx + 1
+        while head_idx < n - lookahead and low[head_idx] < low[head_idx + 1]:
+            head_idx += 1
+        if head_idx >= n - lookahead or low[head_idx] >= ls_val:
+            continue
+        head_val = low[head_idx]
 
-    for rs_idx in range(head_idx + 2, n - lookahead - 1):
-        if low[rs_idx] <= head_val or low[rs_idx - 1] < low[rs_idx]: continue
-        if max(close[head_idx+1:rs_idx], default=0) < neckline * 0.98: continue
-        post = close[rs_idx+1:rs_idx+1+lookahead]
-        if len(post) == 0 or max(post) < low[rs_idx] * 1.02 or min(post) < low[rs_idx]: continue
+        # Step 5: Rally again to 98% of neckline
+        peak_after_head = max(close[head_idx:head_idx + 15], default=0)
+        if peak_after_head < neckline * 0.96:
+            continue
+
+        # Step 6: Drop to form RS
+        rs_idx = head_idx + 1
+        while rs_idx < n - lookahead and low[rs_idx] > low[rs_idx + 1]:
+            rs_idx += 1
+        if rs_idx >= n - lookahead or low[rs_idx] <= head_val:
+            continue
+        rs_val = low[rs_idx]
+
+        # Step 7: After RS, price should not fall below RS
+        future_prices = close[rs_idx + 1:rs_idx + 1 + lookahead]
+        if len(future_prices) == 0 or min(future_prices) < rs_val:
+            continue
 
         return {
-            "ls_val": low[ls_idx], "head_val": head_val, "rs_val": low[rs_idx],
+            "ls_val": ls_val, "head_val": head_val, "rs_val": rs_val,
             "ls_date": df['Date'].iloc[ls_idx],
             "head_date": df['Date'].iloc[head_idx],
             "rs_date": df['Date'].iloc[rs_idx],
             "neckline": neckline
         }
+
     return None
+
 
 # === RETRY MECHANISM + RATE LIMIT === #
 def fetch_candle_data_with_retry(symbol, token, retries=3, delay=2):
@@ -161,12 +194,24 @@ for from_date, to_date in date_ranges:
     detected_ihs_all_runs[from_date] = detected
 
 # === SUMMARY (Tabular Format) === #
-summary_lines = ["📋 Summary of IHS Patterns:\n", f"{'Date Range':<25} | {'IHS Detected'}", "-" * 60]
+summary_lines = ["📋 Summary of IHS Patterns:\n", f"{'Date Range':<25} | {'Stock':<12} | {'LS':<25} | {'Head':<25} | {'RS':<25}","-" * 120]
+
 for from_date, stocks in detected_ihs_all_runs.items():
     from_clean = from_date.split()[0]
     to_clean = to_date.split()[0]
-    detected_str = ", ".join(stocks) if stocks else "None"
-    summary_lines.append(f"{from_clean} to {to_clean:<10} | {detected_str}")
+    
+    for sym in stocks:
+        df_sym = all_stock_data[sym]
+        sliced_df = df_sym[(df_sym['Date'] >= pd.to_datetime(from_clean)) & (df_sym['Date'] <= pd.to_datetime(to_clean))].copy()
+        if len(sliced_df) < 50: continue
+        ihs = detect_ihs_custom(sliced_df)
+        if not ihs: continue
+
+        ls_str = f"{ihs['ls_val']:.2f} on {ihs['ls_date'].date()}"
+        head_str = f"{ihs['head_val']:.2f} on {ihs['head_date'].date()}"
+        rs_str = f"{ihs['rs_val']:.2f} on {ihs['rs_date'].date()}"
+
+        summary_lines.append(f"{from_clean} to {to_clean:<10} | {sym:<12} | {ls_str:<25} | {head_str:<25} | {rs_str:<25}")
 
 summary = "\n".join(summary_lines)
 print(summary)
