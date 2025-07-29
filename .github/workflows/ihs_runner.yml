@@ -33,11 +33,7 @@ jobs:
       - name: Read summary output from file
         id: read_summary
         run: |
-          SUMMARY=$(cat final_summary.txt)
-          SUMMARY="${SUMMARY//'%'/'%25'}"
-          SUMMARY="${SUMMARY//$'\n'/'%0A'}"
-          SUMMARY="${SUMMARY//$'\r'/'%0D'}"
-          echo "summary=$SUMMARY" >> $GITHUB_OUTPUT
+          cat summary_env.txt >> $GITHUB_ENV
           
       - name: Send summary email
         uses: dawidd6/action-send-mail@v3
@@ -49,6 +45,6 @@ jobs:
           subject: IHS Summary Report
           to: bhushpatil008@gmail.com
           from: GitHub Actions <${{ secrets.EMAIL_USER }}>
-          body: ${{ steps.read_summary.outputs.summary }}
+          body: ${{ env.summary }}
 
 
