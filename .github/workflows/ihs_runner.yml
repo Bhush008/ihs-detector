@@ -30,11 +30,6 @@ jobs:
       - name: Run IHS detection script
         run: python NewLogic_1stHead_IHS_GitHub.py
 
-      - name: Read summary output from file
-        id: read_summary
-        run: |
-          cat summary_env.txt >> $GITHUB_ENV
-          
       - name: Send summary email
         uses: dawidd6/action-send-mail@v3
         with:
@@ -45,6 +40,7 @@ jobs:
           subject: IHS Summary Report
           to: bhushpatil008@gmail.com
           from: GitHub Actions <${{ secrets.EMAIL_USER }}>
-          body: ${{ env.summary }}
+          body: "Please find attached the IHS pattern summary in tabular format."
+          attachments: ihs_summary.txt
 
 
