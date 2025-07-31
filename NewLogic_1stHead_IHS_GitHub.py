@@ -248,17 +248,19 @@ for from_date, to_date in date_ranges:
     detected_ihs_all_runs[from_date] = detected_ihs
     detected_db_all_runs[from_date] = detected_db
 
-# === SUMMARY (Tabular Format) === #
-summary_lines = ["📋 Summary of IHS Patterns:\n", f"{'Date Range':<25} | {'Pattern':<15} | {'Stock':<12} ,"-" * 60]
+summary_lines = [
+    "📋 Summary of IHS Patterns:\n",
+    f"{'Date Range':<25} | {'Pattern':<15} | {'Stock':<12}",
+    "-" * 60
+]
 
 for from_date in detected_ihs_all_runs:
-    to_clean = to_date.split()[0]
+    to_clean = to_date.split()[0]  # Make sure to_date is defined earlier
     from_clean = from_date.split()[0]
 
     for sym in detected_ihs_all_runs[from_date]:
         print(f"{from_clean} to {to_clean:<10} | {'IHS':<15} | {sym:<12}")
-
-        summary_lines.append(f"{from_clean} to {to_clean:<10} | {Double Bottom:<12} | {sym:<25} ")
+        summary_lines.append(f"{from_clean} to {to_clean:<10} | {'IHS':<15} | {sym:<12}")
 
 summary = "\n".join(summary_lines)
 print(summary)
