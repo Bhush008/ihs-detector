@@ -13,9 +13,9 @@ api_key = 'joebm3IW'
 user_id = 'AAAF838728'
 pin = '0421'
 totpkey = 'SS4OWS4U3LH5YF66ZR63AYPUDE'
-num_stocks = 10
+num_stocks = 2500
 
-longest_from_date = "2023-01-01 09:15"
+longest_from_date = "2022-01-01 09:15"
 to_date_obj = datetime.now()
 to_date = to_date_obj.strftime("%Y-%m-%d") + " 15:30"
 
