@@ -837,7 +837,7 @@ unique_db_stocks = list(already_detected_db)
 n_stocks = len(unique_db_stocks)
 
 if n_stocks > 0:
-    pdf_filename = 'double_bottom_charts.pdf'
+    pdf_filename = 'Nifty500_PDF_DoublePattern.pdf'
 
      # --- ADD THIS LINE ---
     full_path = os.path.abspath(pdf_filename) 
@@ -947,3 +947,4 @@ for from_date_key in detected_db_all_runs:
 if not has_patterns:
 
     print("No patterns were detected in any range.")
+
