@@ -755,7 +755,7 @@ def fetch_candle_data_with_retry(symbol, token, retries=3, delay=2):
                 "fromdate": longest_from_date, "todate": to_date
             }
             res = smartApi.getCandleData(params)
-            time.sleep(0.35)
+            time.sleep(0.6)
             if res.get('data'):
                 return pd.DataFrame(res['data'], columns=["Date", "Open", "High", "Low", "Close", "Volume"])
         except Exception as e:
@@ -947,4 +947,5 @@ for from_date_key in detected_db_all_runs:
 if not has_patterns:
 
     print("No patterns were detected in any range.")
+
 
