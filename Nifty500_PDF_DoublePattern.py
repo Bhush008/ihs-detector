@@ -14,10 +14,17 @@ import os
 print(f"INFO: The current working directory is: {os.getcwd()}")
 
 # === CONFIGURATION === #
-api_key = 'joebm3IW'
-user_id = 'AAAF838728'
-pin = '0421'
-totpkey = 'SS4OWS4U3LH5YF66ZR63AYPUDE'
+# Load credentials securely from environment variables
+api_key = os.environ.get('API_KEY')
+user_id = os.environ.get('USER_ID')
+pin = os.environ.get('PIN')
+totpkey = os.environ.get('TOTP_KEY')
+
+# Check if all secrets are loaded
+if not all([api_key, user_id, pin, totpkey]):
+    print("❌ ERROR: One or more required secrets (API_KEY, USER_ID, PIN, TOTP_KEY) are not set.")
+    exit()
+
 #num_stocks = 2500
 
 longest_from_date = "2023-01-01 09:15"
@@ -938,4 +945,5 @@ for from_date_key in detected_db_all_runs:
         has_patterns = True
 
 if not has_patterns:
+
     print("No patterns were detected in any range.")
