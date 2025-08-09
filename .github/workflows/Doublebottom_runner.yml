@@ -1,6 +1,6 @@
 # .github/workflows/daily_report.yml
 
-name: Double Bottom Report
+name: Run Double Bottom Report
 
 on:
   # Schedule to run at 16:30 UTC, which is 10:00 PM IST
@@ -41,7 +41,7 @@ jobs:
           USER_ID: ${{ secrets.USER_ID }}
           PIN: ${{ secrets.PIN }}
           TOTP_KEY: ${{ secrets.TOTP_KEY }}
-        run: Nifty500_PDF_DoublePattern.py # <-- IMPORTANT: Replace with your actual script file name
+        run: python Nifty500_PDF_DoublePattern.py # <-- IMPORTANT: Replace with your actual script file name
 
       # 5. Sends the generated PDF via email
       - name: Send email with PDF attachment
