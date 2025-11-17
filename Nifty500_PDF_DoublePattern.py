@@ -68,6 +68,7 @@ except Exception as e:
 # 1. Define the specific list of stocks you want to analyze here
 target_symbols = ['360ONE-EQ',
 '3MINDIA-EQ',
+'TYROCARE-EQ',
 'ABB-EQ',
 'ACC-EQ',
 'ACMESOLAR-EQ',
@@ -890,3 +891,4 @@ else:
         print(f"{sym:<15} | {pattern_name:<22} | {date_scope:<25}")
 
 print("-" * 70)
+
