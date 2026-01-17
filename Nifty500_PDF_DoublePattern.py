@@ -570,14 +570,42 @@ def detect_multi_year_breakout(df):
     if hist_df.empty:
         return None
 
+    # --- ATH value ---
     ath = hist_df['High'].max()
-    close = df['Close'].iloc[-1]
-    high = df['High'].iloc[-1]
 
-    if close <= ath * 1.10 and close >= ath * 0.98:
-        return {"ath": ath, "close": close, "high": high}
+    # --- FIRST ATH date (force scalar) ---
+    ath_row = hist_df[hist_df['High'] == ath].iloc[0]
+    ath_date = ath_row['Date']
 
-    return None
+    # --- Post ATH data ---
+    post_ath_df = df[df['Date'] > ath_date]
+    if post_ath_df.empty:
+        return None
+
+    # --- Rule 2: +4% / +2% logic ---
+    crossed_4pct = False
+
+    for close in post_ath_df['Close']:
+        if close > ath * 1.04:
+            crossed_4pct = True
+
+        if crossed_4pct and close < ath * 1.02:
+            return None   # ❌ Invalid MYB
+
+    # --- Rule 3: Today condition (unchanged) ---
+    today_close = df['Close'].iloc[-1]
+    today_high  = df['High'].iloc[-1]
+
+    if not (ath * 0.98 <= today_close <= ath * 1.10):
+        return None
+
+    return {
+        "ath": ath,
+        "ath_date": ath_date,
+        "close": today_close,
+        "high": today_high
+    }
+
 
 
 def fetch_full_history(symbol, token):
@@ -741,11 +769,19 @@ with PdfPages(pdf_file) as pdf:
                     )
 
 
-                    pct = ((close-ath)/ath)*100
-                    ax.text(0.02, 0.95, f'Δ from ATH : {pct:.2f}%',
-                            transform=ax.transAxes, fontsize=10,
-                            ha='left', va='top',
-                            bbox=dict(facecolor='white', alpha=0.8))
+                    pct = ((close - ath) / ath) * 100
+                    ath_date = info['ath_date'].strftime('%d-%b-%Y')
+
+                    ax.text(
+                        0.02, 0.95,
+                        f'Δ from ATH : {pct:.2f}%\nATH Date : {ath_date}',
+                        transform=ax.transAxes,
+                        fontsize=10,
+                        ha='left',
+                        va='top',
+                        bbox=dict(facecolor='white', alpha=0.85)
+                    )
+
 
                 else:
                     plot_df = df[df['Date'] >= df['Date'].max() - relativedelta(years=1)]
