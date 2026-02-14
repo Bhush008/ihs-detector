@@ -582,14 +582,14 @@ def detect_multi_year_breakout(df):
     if post_ath_df.empty:
         return None
 
-    # --- Rule 2: +4% / +2% logic ---
+    # --- Rule 2: +2% / -2% logic ---
     crossed_4pct = False
 
     for close in post_ath_df['Close']:
-        if close > ath * 1.04:
+        if close > ath * 1.02:
             crossed_4pct = True
 
-        if crossed_4pct and close < ath * 1.02:
+        if crossed_4pct and close < ath * 0.98:
             return None   # ❌ Invalid MYB
 
     # --- Rule 3: Today condition (unchanged) ---
@@ -812,3 +812,4 @@ with PdfPages(pdf_file) as pdf:
 
 
 print(f"\n✅ FINAL PDF generated at:\n{os.path.abspath(pdf_file)}")
+
